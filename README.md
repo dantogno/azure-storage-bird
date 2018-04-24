@@ -1,2 +1,2 @@
 # azure-storage-bird
-This sample game project demonstrates downloading files at runtime from Azure Storage using the Azure Storage SDK for Unity. 
+Simple Unity game that uses Azure storage for downloading additional assets at runtime.
