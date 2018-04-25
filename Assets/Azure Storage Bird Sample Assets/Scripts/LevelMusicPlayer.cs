@@ -24,10 +24,9 @@ public class LevelMusicPlayer : MonoBehaviour
     // Use this for initialization
     private void Awake () 
 	{
+        DontDestroyOnLoad(this.gameObject);
         audioClips = new AudioClip[MusicFileNamesInLevelOrder.Length];
         audioSource = GetComponent<AudioSource>();
-
-        StartCoroutine(PreloadClipsFromStreamingAssets());
     }
 
     private IEnumerator PreloadClipsFromStreamingAssets()
@@ -59,15 +58,6 @@ public class LevelMusicPlayer : MonoBehaviour
         audioSource.Play();
     }
 
-    /// <summary>
-    /// GameControl.StartedNewLevel event handler.
-    /// </summary>
-    /// <param name="levelIndex">The event passes us the current levelIndex.</param>
-    private void OnStartedNewLevel(int levelIndex)
-    {
-        PlayAudioClipForNewLevel(levelIndex);
-    }
-
     private void PlayAudioClipForNewLevel(int levelIndex)
     {
         if (audioClips.Length > levelIndex)
@@ -75,6 +65,16 @@ public class LevelMusicPlayer : MonoBehaviour
             audioSource.clip = audioClips[levelIndex];
             audioSource.Play();
         }
+    }
+
+    #region Event handlers
+    /// <summary>
+    /// GameControl.StartedNewLevel event handler.
+    /// </summary>
+    /// <param name="levelIndex">The event passes us the current levelIndex.</param>
+    private void OnStartedNewLevel(int levelIndex)
+    {
+        PlayAudioClipForNewLevel(levelIndex);
     }
 
     /// <summary>
@@ -85,17 +85,29 @@ public class LevelMusicPlayer : MonoBehaviour
         audioSource.Stop();
     }
 
+    /// <summary>
+    /// TitleSceneBehavior.DownloadingMusicFilesFinished event handler.
+    /// We need to wait for the files to be done downloading, then begin preloading.
+    /// </summary>
+    private void OnDownloadingMusicFilesFinished()
+    {
+        StartCoroutine(PreloadClipsFromStreamingAssets());
+    }
+    #endregion
+
     #region Event subscription / unsubscription
     private void OnEnable()
     {
         GameControl.StartedNewLevel += OnStartedNewLevel;
         GameControl.GameOver += OnGameOver;
+        TitleSceneBehavior.DownloadingMusicFilesFinished += OnDownloadingMusicFilesFinished;
     }
 
     private void OnDisable()
     {
         GameControl.StartedNewLevel -= OnStartedNewLevel;
         GameControl.GameOver -= OnGameOver;
+        TitleSceneBehavior.DownloadingMusicFilesFinished += OnDownloadingMusicFilesFinished;
     }
     #endregion
 }
