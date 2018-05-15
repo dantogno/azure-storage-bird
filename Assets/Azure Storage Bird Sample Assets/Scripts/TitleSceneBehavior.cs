@@ -13,6 +13,31 @@ public class TitleSceneBehavior : MonoBehaviour
 {
     public static event Action DownloadingMusicFilesFinished;
 
+    /// <summary>
+    /// Local location assets downloaded from Azure Storage will be saved to.
+    /// </summary>
+    public static string DestinationPath
+    {
+        // The Android platform stores StreamingAssets inside a
+        // .jar file, and we cannot write to that location.
+        // So we use Application.persistentDataPath on Android.
+
+        // For reasons I don't understand, using Application.persistentDataPath
+        // in the URL of a WWW on standalone builds or in the editor fails.
+        // So streamingAssetsPath is used in those cases. Perhaps it's a Unity bug.
+        get
+        {
+#if UNITY_EDITOR
+            return Application.streamingAssetsPath;
+#endif
+#if UNITY_ANDROID
+            return Application.persistentDataPath;
+#else
+            return Application.streamingAssetsPath;
+#endif
+        }
+    }
+
     #region Editor fields
     [SerializeField]
     private Button playButton, quitButton;
@@ -31,14 +56,11 @@ public class TitleSceneBehavior : MonoBehaviour
     // Scene name used for loading the next scene
     private const string gameSceneName = "Game Scene";
 
-    // Local location assets downloaded from Azure Storage will be saved to.
-    private string destinationPath;
-
     private Text playButtonText;
 
     // Used to keep track of when we are ready to start the game.
     private bool filesAreDownloaded, filesArePreloaded;
-    #endregion
+#endregion
 
     private void Awake()
     {
@@ -55,7 +77,6 @@ public class TitleSceneBehavior : MonoBehaviour
     private async void Start ()
     {
         playButtonText = playButton.GetComponentInChildren<Text>();
-        destinationPath = Application.streamingAssetsPath;
         EnablePlayButton(false);
         await ShowDownloadingPopupAsync(true);
         await DownloadRequiredFiles();
@@ -73,11 +94,11 @@ public class TitleSceneBehavior : MonoBehaviour
         bool requiredFilesExist = CheckIfRequiredFilesExist();
         if (!requiredFilesExist)
         {            
-            if (!Directory.Exists(Application.streamingAssetsPath))
+            if (!Directory.Exists(DestinationPath))
             {
-                Directory.CreateDirectory(Application.streamingAssetsPath);
+                Directory.CreateDirectory(DestinationPath);
             }
-            await BlobStorageUtilities.DownloadAllBlobsInContainerAsync(blockBlobContainerName, destinationPath);            
+            await BlobStorageUtilities.DownloadAllBlobsInContainerAsync(blockBlobContainerName, DestinationPath);            
         }
         DownloadingMusicFilesFinished?.Invoke();
     }
@@ -113,7 +134,7 @@ public class TitleSceneBehavior : MonoBehaviour
         // we need to download from Azure.
         foreach (var filename in LevelMusicPlayer.MusicFileNamesInLevelOrder)
         {
-            var path = Path.Combine(destinationPath, filename);
+            var path = Path.Combine(DestinationPath, filename);
             if (!File.Exists(path))
             {
                 return false;
@@ -131,7 +152,7 @@ public class TitleSceneBehavior : MonoBehaviour
         bool shouldEnablePlayButton = filesAreDownloaded && filesArePreloaded;
         EnablePlayButton(shouldEnablePlayButton);
     }
-    #region Event handlers
+#region Event handlers
     private void OnDownloadingMusicFilesFinished()
     {
         filesAreDownloaded = true;
@@ -143,8 +164,8 @@ public class TitleSceneBehavior : MonoBehaviour
         await ShowDownloadingPopupAsync(false);
         UpdatePlayButton();
     }
-    #endregion
-    #region Unity UI Button click event handlers
+#endregion
+#region Unity UI Button click event handlers
     public void PlayButtonClicked()
     {
         SceneManager.LoadScene(gameSceneName);
@@ -154,8 +175,8 @@ public class TitleSceneBehavior : MonoBehaviour
     {
         Application.Quit();
     }
-    #endregion
-    #region Event subscription / unsubscription
+#endregion
+#region Event subscription / unsubscription
     private void OnEnable()
     {
         DownloadingMusicFilesFinished += OnDownloadingMusicFilesFinished;
@@ -167,5 +188,5 @@ public class TitleSceneBehavior : MonoBehaviour
         DownloadingMusicFilesFinished -= OnDownloadingMusicFilesFinished;
         LevelMusicPlayer.LoadingAudioClipsFinished -= OnLoadingAudioClipsFinishedAsync;
     }
-    #endregion
+#endregion
 }

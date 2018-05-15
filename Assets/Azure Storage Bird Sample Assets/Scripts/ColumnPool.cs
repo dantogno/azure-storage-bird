@@ -24,7 +24,7 @@ public class ColumnPool : MonoBehaviour
     [SerializeField]
     private float columnSpawnX = 10;
 
-    private int columnPoolSize = 5;
+    private int columnPoolSize = 6;
     private Vector2 objectPoolPosition = new Vector2(-15, -25);
     private GameObject[] columns;
     private float timeSinceLastSpawned;

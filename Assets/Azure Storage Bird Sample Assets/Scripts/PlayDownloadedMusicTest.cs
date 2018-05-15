@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
-/// Test class used to demonstrate downloading blobs and playing music from Streaming Assets.
+/// Test class that demonstrates playing auido clips from downloaded blobs.
+/// Note that this simplified test does not support Android, as writing to
+/// streamingAssets is not possible on the Android platform.
+/// However, the larger sample game works around this and supports all mobile and standalone platforms.
 /// </summary>
 public class PlayDownloadedMusicTest : MonoBehaviour 
 {
