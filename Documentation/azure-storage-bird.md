@@ -8,7 +8,11 @@ ms.assetid:
 ---
 # Azure Storage Bird
 
+[!include[](https://docs.microsoft.com/en-us/sandbox/includes/header.md)]
+
 ![Azure Storage Bird heading image](media/azstbird_title-screen.png)
+
+[![Get the source](https://docs.microsoft.com/en-us/sandbox/media/buttons/source2.png)](https://aka.ms/azsamples-unity)
 
 ## Introduction
 
@@ -19,8 +23,13 @@ Because music files typically are among the largest data files in games, the sam
 ## Requirements
 
 * [Unity 2017.1 (or greater)](https://unity3d.com/)
-  * Unity 2017.1 includes a new scripting runtime that supports .NET 4.6.  This feature allows us to use the existing Azure SDKs with some tweaks.  Please see [this blog post from Unity](https://blogs.unity3d.com/2017/07/11/introducing-unity-2017/) for more information.
+  * Unity 2017.1 includes a new scripting runtime that supports .NET 4.6. This feature allows use of the existing Azure SDKs with some tweaks.  Please see [this blog post from Unity](https://blogs.unity3d.com/2017/07/11/introducing-unity-2017/) for more information.
 * [An Azure subscription (create for free!)](https://aka.ms/azfreegamedev)
+
+> [!NOTE]
+> This project requires the "experimental" .NET 4.6 Mono scripting runtime in Unity 2017. [Unity has stated that soon this will be the default](https://forum.unity3d.com/threads/future-plans-for-the-mono-runtime-upgrade.464327/), however for now, it is still labeled as "experimental" and you may experience issues.
+>
+> In addition, we will be using an experimental Azure Mobile Client SDK in this tutorial, and, as such, this may not build and run on every single Unity platform.  Please see the [Azure Mobile Apps SDK for Unity](/sandbox/gamedev/unity/azure-mobile-apps-unity) article for a list of known working platforms and issues.
 
 ## Azure setup
 
@@ -35,19 +44,16 @@ Because music files typically are among the largest data files in games, the sam
 > [!NOTE]
 > The sample project is hardcoded to look in a block blob container called `music` and use the specific file names included in the sample music zip file (`Track1.ogg` through `Track10.ogg`). If you use differently named files, or only upload some of the files, you will need to modify the sample project's code accordingly.
 
-## Create a new 2D Unity project
+## Download the sample Unity project
 
-1. Launch Unity and press the **New** button.
+Clone or download the project from the [AzureSamples-Unity repo](https://aka.ms/azsamples-unity) on GitHub. 
 
-1. Select the **2D** radio button.
-
-1. Enter a **Project name** and click **Create project.**
-
-![azstbird_newproject.png](media/azstbird_newproject.png)
+* On the GitHub site, click the **Clone or download** button to get a copy of the project to work with.
+* This project is located within the `AzureStorageBird` directory.
 
 ## Set scripting runtime version to .NET 4.6 equivalent
 
-The Azure Storage for Unity SDK requires the .NET 4.6 equivalent scripting runtime. This is only available in Unity 2017+.
+The Azure Storage for Unity SDK requires the .NET 4.6 equivalent scripting runtime. This is only available in Unity 2017.1 and above.
 
 1. From the Unity menu select **Edit > Project Settings > Player** to open the **PlayerSettings** panel.
 
@@ -78,5 +84,6 @@ The sample game assets depend on the Azure Storage SDK, so be sure to import it 
 1. In the **Import Unity Package** box that pops up, keep all of the items checked and click the **Import** button to add them to your project.
 
 ## Configure Unity build settings
-
-## 
+1. Select a supported platform as the build target (see Azure Storage SDK [compatibility info](https://docs.microsoft.com/en-us/sandbox/gamedev/unity/azure-storage-unity#compatibility) for details).
+1. Add the `Title Scene` to **index 0** of the **Scenes in Build** list.
+1. Add the `Game Scene` to **index 1** of the **Scenes in Build** list.
